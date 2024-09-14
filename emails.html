@@ -1,0 +1,179 @@
+<html><head><base href="https://websim.creation.engine/" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Capture SAAS</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  input[type="url"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  #codeBox {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  #copyButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  #preview {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Email Capture SAAS</h1>
+    <p>Easily capture emails and add users to your waitlist using Google Forms. Just enter your Google Form URL below to get started!</p>
+    
+    <label for="formUrl">Enter your Google Form URL:</label>
+    <input type="url" id="formUrl" placeholder="https://docs.google.com/forms/d/e/.../viewform" required>
+    
+    <h2>Your Email Capture Code:</h2>
+    <div id="codeBox"></div>
+    <button id="copyButton">Copy Code</button>
+    
+    <div id="preview">
+      <h3>Preview:</h3>
+      <div id="previewContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const formUrlInput = document.getElementById('formUrl');
+    const codeBox = document.getElementById('codeBox');
+    const copyButton = document.getElementById('copyButton');
+    const previewContent = document.getElementById('previewContent');
+
+    formUrlInput.addEventListener('input', updateCode);
+
+    function updateCode() {
+      const formUrl = formUrlInput.value;
+      if (!formUrl) {
+        codeBox.textContent = 'Please enter a valid Google Form URL';
+        previewContent.innerHTML = '';
+        return;
+      }
+
+      const code = `
+<style>
+  .email-capture {
+    display: flex;
+    max-width: 400px;
+    margin: 20px auto;
+  }
+  .email-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+  }
+  .waitlist-button {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #000;
+    border-left: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: 0 4px 4px 0;
+  }
+  .waitlist-button svg {
+    margin-right: 5px;
+  }
+</style>
+
+<form id="emailCaptureForm" class="email-capture">
+  <input type="email" name="email" class="email-input" placeholder="Enter your email" required>
+  <button type="submit" class="waitlist-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+    </svg>
+    Waitlist
+  </button>
+</form>
+
+<script>
+document.getElementById('emailCaptureForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const email = this.email.value;
+  const formUrl = '${formUrl}';
+  const formId = formUrl.match(/\\/e\\/([\\w-]+)/)[1];
+  const formData = new FormData();
+  formData.append('entry.1234567890', email); // Replace with your actual form field ID
+
+  fetch(\`https://docs.google.com/forms/d/e/\${formId}/formResponse\`, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
+  }).then(() => {
+    alert('Thank you for sending us your email.');
+    this.reset();
+  }).catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred. Please try again.');
+  });
+});
+<\/script>`;
+
+      codeBox.textContent = code;
+      previewContent.innerHTML = code;
+    }
+
+    copyButton.addEventListener('click', () => {
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = codeBox.textContent;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextArea);
+      alert('Code copied to clipboard!');
+    });
+
+    updateCode();
+  </script>
+</body>
+</html>
