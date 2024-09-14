@@ -1,0 +1,205 @@
+<html><head><base href="https://websim.creation.engine/" />
+<title>Easy Email Capture for Google Sheets</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    h1, h2 {
+        color: #2c3e50;
+    }
+    .container {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #sheetsUrl {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    #generateBtn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    #generateBtn:hover {
+        background-color: #2980b9;
+    }
+    #codeBox {
+        background-color: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    #copyBtn {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+    }
+    #copyBtn:hover {
+        background-color: #27ae60;
+    }
+    #previewContainer {
+        margin-top: 30px;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Easy Email Capture!</h1>
+        <p>Capture emails easily and send them directly to your Google Sheets.</p>
+        
+        <h2>Step 1: Enter your Google Sheets URL</h2>
+        <input type="text" id="sheetsUrl" placeholder="Enter your Google Sheets URL here">
+        <button id="generateBtn">Generate Code</button>
+        
+        <div id="codeBox" style="display:none;"></div>
+        <button id="copyBtn" style="display:none;">Copy Code</button>
+
+        <div id="previewContainer" style="display:none;">
+            <h2>Preview</h2>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const sheetsUrl = document.getElementById('sheetsUrl').value;
+            if (!sheetsUrl) {
+                alert('Please enter a valid Google Sheets URL');
+                return;
+            }
+            
+            const code = `
+<style>
+    .email-capture {
+        display: flex;
+        align-items: center;
+        max-width: 400px;
+        margin: 20px auto;
+    }
+    .email-input {
+        flex-grow: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+    .waitlist-btn {
+        background-color: white;
+        color: black;
+        border: 1px solid black;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        border-radius: 4px;
+    }
+    .waitlist-btn svg {
+        margin-right: 5px;
+    }
+</style>
+
+<div class="email-capture">
+    <input type="email" class="email-input" placeholder="Enter your email">
+    <button class="waitlist-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.708 2.825L15 11.105V5.383zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383v5.722z"/>
+        </svg>
+        Waitlist
+    </button>
+</div>
+
+<script>
+document.querySelector('.waitlist-btn').addEventListener('click', function() {
+    const email = document.querySelector('.email-input').value;
+    if (!email) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    const sheetsUrl = '${sheetsUrl}';
+    
+    fetch(sheetsUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'email=' + encodeURIComponent(email)
+    }).then(() => {
+        alert('Thank you for sending us your email.');
+        document.querySelector('.email-input').value = '';
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+});
+<\/script>`;
+            
+            document.getElementById('codeBox').textContent = code;
+            document.getElementById('codeBox').style.display = 'block';
+            document.getElementById('copyBtn').style.display = 'block';
+
+            // Update preview
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('previewContent').innerHTML = code;
+
+            // Re-run the script for the preview
+            const previewScript = document.createElement('script');
+            previewScript.textContent = `
+                document.querySelector('.waitlist-btn').addEventListener('click', function() {
+                    const email = document.querySelector('.email-input').value;
+                    if (!email) {
+                        alert('Please enter a valid email address');
+                        return;
+                    }
+                    
+                    alert('This is a preview. In the actual implementation, the email would be sent to Google Sheets.');
+                    document.querySelector('.email-input').value = '';
+                });
+            `;
+            document.getElementById('previewContent').appendChild(previewScript);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const codeBox = document.getElementById('codeBox');
+            const range = document.createRange();
+            range.selectNode(codeBox);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            alert('Code copied to clipboard!');
+        });
+    </script>
+</body>
+</html>
